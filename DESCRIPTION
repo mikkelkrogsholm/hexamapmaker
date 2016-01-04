@@ -1,0 +1,17 @@
+Package: hexamapmaker
+Type: Package
+Title: Turns points into hexagons
+Version: 0.1
+Date: 2016-01-04
+Author: Mikkel Freltoft Krogsholm
+Maintainer: Mikkel Freltoft Krogsholm <mikkel@56n.dk>
+Description: Hexamap takes a set of points in a x and y coordinate and turns
+    them into hexagons. The idea is, that you can quickly design the layout of
+    a hexagon map by just adding points in a coordinate system. Then the hexamap
+    function turns them into hexagon-shaped polygons that can be plotted with
+    ggplot2.
+License: Free
+LazyData: TRUE
+RoxygenNote: 5.0.1
+Imports: praise
+Suggests: ggplot2
