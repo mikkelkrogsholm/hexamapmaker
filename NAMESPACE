@@ -2,3 +2,4 @@
 
 export(hexalabel)
 export(hexamap)
+export(makeGoodShape)

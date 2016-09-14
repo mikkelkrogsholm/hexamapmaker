@@ -41,10 +41,16 @@
 #' ggplot(zz, aes(x, y, group = id)) +
 #'   geom_polygon(colour="black", fill = NA) +
 #'   coord_fixed(ratio = 1)
+#'
+#'
+#' # Add color by using the fill argument in ggplot.
+#' # Remember to remove it from the geom_polygon then
+#'
+#' ggplot(zz, aes(x, y, group = id, fill = id)) +
+#'   geom_polygon(colour="black") +
+#'   coord_fixed(ratio = 1)
 
 hexamap <- function(z){
-
-  require(praise)
 
   hexadata <- data.frame()
 
@@ -63,7 +69,7 @@ hexamap <- function(z){
     hexadata <- rbind(hexadata, mydata)
   }
 
-  print(praise("${EXCLAMATION}! Your new hexagon map is ${adjective}!"))
+  print(praise::praise("${EXCLAMATION}! Your new hexagon map is ${adjective}!"))
 
   return(hexadata)
 }
