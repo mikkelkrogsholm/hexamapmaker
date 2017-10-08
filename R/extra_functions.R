@@ -1,12 +1,11 @@
 #' Fixes bad coordinates i z
 #'
-#' @name makeGoodShape
+#' @name fix_shape
 #'
-#' @param
-#' z: A data frame containing x, y and id.
+#' @param z A data frame containing x, y and id.
 #'
 #' @description
-#' makeGoodShape takes a set of points (x and y coordinates) and fixes them so they are ready for hexamap.
+#' fix_shape takes a set of points (x and y coordinates) and fixes them so they are ready for hexamap.
 #'
 #' @return
 #' The function returns a data frame with coordinates
@@ -14,45 +13,69 @@
 #' @export
 #'
 #' @examples
-#'
+#' # Load libraries
 #' library(hexamapmaker)
 #' library(ggplot2)
+#' library(tibble)
+#' library(ggthemes)
 #'
-#' ## Example using a "normal" grid
-#' x <- c(1,2,1,2,1,2,4,4)
-#' y <- c(1,1,2,2,3,3,1,2)
+#' # Points on a "normal" grid.
+#' my_points <- tibble::tibble(
+#'   x = c(1, 2, 1, 2, 1, 2, 4, 4),
+#'   y = c(1, 1, 2, 2, 3, 3, 1, 2),
+#'   id = c("test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8")
+#' )
 #'
-#' id <- c("test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8")
+#' # Plot the points
+#' ggplot(my_points, aes(x = x, y = y, group = id)) +
+#'   geom_point() +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
-#' z <- data.frame(id,x,y)
+#' # Turn points into hexagons
+#' hexa_points <- make_polygons(my_points)
 #'
-#' ggplot(z, aes(x, y, group = id)) +
-#'   geom_point() +  coord_fixed(ratio = 1)
+#' # Plot the new hexagons
+#' ggplot(hexa_points, aes(x, y, group = id)) +
+#'   geom_polygon(colour = "black", fill = NA) +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
-#' zz <- hexamap(z)
+#' # Oh no! It is way off - lets fix it.
+#' my_points <- fix_shape(my_points)
 #'
-#' ggplot(zz, aes(x, y, group = id)) +
-#'   geom_polygon(colour="black", fill = NA) +
-#'   coord_fixed(ratio = 1) ## Messed up
+#' # Plot points
+#' ggplot(my_points, aes(x = x, y = y, group = id)) +
+#'   geom_point() +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
-#' ## Now use new function to fix structure:
-#' newZ <- makeGoodShape(z)
+#' # Turn points into hexagons
+#' hexa_points <- make_polygons(my_points)
 #'
-#' ggplot(newZ, aes(x, y, group = id)) +
-#'   geom_point() +  coord_fixed(ratio = 1)
+#' ggplot(hexa_points, aes(x, y, group = id)) +
+#'   geom_polygon(colour = "black", fill = NA) +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
-#' zzz <- hexamap(newZ)
+#' # Add color by using the fill argument in ggplot.
+#' # Remember to remove it from the geom_polygon then
+#' (p <- ggplot(hexa_points, aes(x, y, group = id, fill = id)) +
+#'     geom_polygon(colour = "black", show.legend = FALSE) +
+#'     coord_fixed(ratio = 1) +
+#'     theme_map())
 #'
-#' ggplot(zzz, aes(x, y, group = id)) +
-#'   geom_polygon(colour="black", fill = NA) +
-#'   coord_fixed(ratio = 1)
+#' # Label hexagons
+#' add_hexalabel(hexa_points, p)
 
-makeGoodShape <- function(z){
+fix_shape <- function(z){
 
-  z$x[y%%2==0] <- z$x[y%%2==0]* 2
-  z$x[y%%2==1] <- z$x[y%%2==1]* 2 - 1
-  z$y[y%%2==0] <- z$y[y%%2==0]* 2 - 1
-  z$y[y%%2==1] <- z$y[y%%2==1]* 2 - 1
+  y <- z$y
+
+  z$x[y %% 2 == 0] <- z$x[y %% 2 == 0] * 2
+  z$x[y %% 2 == 1] <- z$x[y %% 2 == 1] * 2 - 1
+  z$y[y %% 2 == 0] <- z$y[y %% 2 == 0] * 2 - 1
+  z$y[y %% 2 == 1] <- z$y[y %% 2 == 1] * 2 - 1
 
   return(z)
 }

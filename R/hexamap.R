@@ -1,14 +1,12 @@
 #' Turns a set of points into hexagons
 #'
-#' @name hexamap
+#' @name make_polygons
 #'
-#' @param
-#' z: A data frame containing x, y and id.
+#' @param z A data frame containing x, y and id.
 #'
 #' @description
-#' Hexamap takes a set of points (x and y coordinates) and turns them into hexagons.
+#' make_polygons takes a set of points (x and y coordinates) and turns them into hexagons.
 #' The idea is, that you can quickly design the layout of a hexagon map by just adding points in a coordinate system. Then the hexamap function turns them into hexagon-shaped polygons that can be plotted with ggplot2.
-#' Note: the x's and y's must be spaced with 2 apart. See example.
 #'
 #' @return
 #' The function returns a set of hexagons.
@@ -16,60 +14,80 @@
 #' @export
 #'
 #' @examples
-#' # Create data frame
-#' # Notice the spacing of the points
-#'
-#' x <- c(1,3,2,4,1,3,7,8)
-#' y <- c(1,1,3,3,5,5,1,3)
-#' id <- c("test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8")
-#' z <- data.frame(id,x,y)
-#'
-#' # Plot points
-#'
+#' # Load libraries
+#' library(hexamapmaker)
 #' library(ggplot2)
-#' ggplot(z, aes(x, y, group = id)) +
+#' library(tibble)
+#' library(ggthemes)
+#'
+#' # Points on a "normal" grid.
+#' my_points <- tibble::tibble(
+#'   x = c(1, 2, 1, 2, 1, 2, 4, 4),
+#'   y = c(1, 1, 2, 2, 3, 3, 1, 2),
+#'   id = c("test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8")
+#' )
+#'
+#' # Plot the points
+#' ggplot(my_points, aes(x = x, y = y, group = id)) +
 #'   geom_point() +
 #'   coord_fixed(ratio = 1) +
-#'   ylim(0,max(y)) + xlim(0,max(x))
+#'   theme_map()
 #'
 #' # Turn points into hexagons
+#' hexa_points <- make_polygons(my_points)
 #'
-#' library(hexamapmaker)
+#' # Plot the new hexagons
+#' ggplot(hexa_points, aes(x, y, group = id)) +
+#'   geom_polygon(colour = "black", fill = NA) +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
-#' zz <- hexamap(z)
+#' # Oh no! It is way off - lets fix it.
+#' my_points <- fix_shape(my_points)
 #'
-#' ggplot(zz, aes(x, y, group = id)) +
-#'   geom_polygon(colour="black", fill = NA) +
-#'   coord_fixed(ratio = 1)
+#' # Plot points
+#' ggplot(my_points, aes(x = x, y = y, group = id)) +
+#'   geom_point() +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
+#' # Turn points into hexagons
+#' hexa_points <- make_polygons(my_points)
+#'
+#' ggplot(hexa_points, aes(x, y, group = id)) +
+#'   geom_polygon(colour = "black", fill = NA) +
+#'   coord_fixed(ratio = 1) +
+#'   theme_map()
 #'
 #' # Add color by using the fill argument in ggplot.
 #' # Remember to remove it from the geom_polygon then
+#' (p <- ggplot(hexa_points, aes(x, y, group = id, fill = id)) +
+#'     geom_polygon(colour = "black", show.legend = FALSE) +
+#'     coord_fixed(ratio = 1) +
+#'     theme_map())
 #'
-#' ggplot(zz, aes(x, y, group = id, fill = id)) +
-#'   geom_polygon(colour="black") +
-#'   coord_fixed(ratio = 1)
+#' # Label hexagons
+#' add_hexalabel(hexa_points, p)
+make_polygons <- function(z){
 
-hexamap <- function(z){
-
-  hexadata <- data.frame()
+  hexadata <- tibble::tibble()
 
   for(i in z$id){
 
     mydata <- z[z$id == i,]
-    x <- mydata$x + c(-1,-1,0,1,1,0)
-    y <- mydata$y + c(0,1,1.577,1,0,-0.577)
+    x <- mydata$x + c(-1, -1, 0, 1, 1, 0)
+    y <- mydata$y + c(0, 1, 1.577, 1, 0, -0.577)
 
     multiplier <- (mydata$y-1)/2
 
     y <- y - 0.423 * multiplier
 
-    mydata <- data.frame(id = i, x, y)
+    mydata <- tibble::tibble(id = i, x, y)
 
-    hexadata <- rbind(hexadata, mydata)
+    hexadata <- dplyr::bind_rows(hexadata, mydata)
   }
 
-  print(praise::praise("${EXCLAMATION}! Your new hexagon map is ${adjective}!"))
+  message(praise::praise("${EXCLAMATION}! Your new hexagon map is ${adjective}!"))
 
   return(hexadata)
 }
