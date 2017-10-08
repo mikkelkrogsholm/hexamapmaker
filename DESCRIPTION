@@ -1,11 +1,11 @@
 Package: hexamapmaker
 Type: Package
-Title: Turns Points Into Hexagons
+Title: Turns Points into Hexagons
 Version: 0.1
 Date: 2017-10-08
 Author: Mikkel Freltoft Krogsholm
 Maintainer: Mikkel Freltoft Krogsholm <mikkel@56n.dk>
-Description: 'hexamapmaker' takes a set of points in a x and y coordinate and turns
+Description: Takes a set of points in a x and y coordinate and turns
     them into hexagons. The idea is, that you can quickly design the layout of
     a hexagon map by just adding points in a coordinate system. Then the hexamap
     function turns them into hexagon-shaped polygons that can be plotted with
